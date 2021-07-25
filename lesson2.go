@@ -16,7 +16,7 @@ type DnsRecord struct {
 }
 
 func GetDomain(record *DnsRecord) error{
-	db, err := sqlx.Open("mysql", "test:xlk98Ala2@tcp(10.12.77.56:3306)/test")
+	db, err := sqlx.Open("mysql", "texxxst:xxx@tcp(x.x.x.x:3306)/test")
 	if err != nil {
 		fmt.Println(err)
 	}
