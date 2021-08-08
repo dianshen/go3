@@ -1,13 +1,16 @@
 package main
 
 import (
-	"database/sql"
+	"common"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"log"
 )
 
+type Domain interface {
+	GetDomainInfo()
+}
 
 type DnsRecord struct {
 	DomainName string `db:"domain_name"`
@@ -15,25 +18,20 @@ type DnsRecord struct {
 	RecordList string	`db:"record_list"`
 }
 
-func GetDomain(record *DnsRecord) error{
-	db, err := sqlx.Open("mysql", "texxxst:xxx@tcp(x.x.x.x:3306)/test")
+func (record *DnsRecord) GetDomainInfo() error{
+	db, err := sqlx.Open("mysql", common.GetMySQLDataSourceName())
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer db.Close()
-	//err = db.QueryRow("select domain_name from dns_record where dial_point_uuid = $1", dial_point_uuid).Scan(&karma)
-	err = db.QueryRow("select domain_name, record_list, dig_time from dns_record " +
-		"where id=100").Scan(
-		&record.DomainName,  &record.RecordList, &record.DigTime)
-	if err == sql.ErrNoRows {
-		return nil
-	}
+	row := db.QueryRow("select domain_name, record_list, dig_time from dns_record where 1=0")
+	err = row.Scan(&record.DomainName,  &record.RecordList, &record.DigTime)
 	return err
 }
 
 func main() {
-	var dnsRecord = DnsRecord{}
-	err := GetDomain(&dnsRecord)
+	log.SetFlags(log.Llongfile | log.Lmicroseconds)
+	dnsRecord := &DnsRecord{}
+	err := dnsRecord.GetDomainInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
